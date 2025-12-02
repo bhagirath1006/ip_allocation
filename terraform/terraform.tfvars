@@ -1,17 +1,11 @@
-# AWS Resource IDs - Update these with your actual values
-# Get these from your AWS Console
+# AWS Resource IDs - Your actual values
+vpc_id = "vpc-0ed9e59c3d9a8c9f5"
 
-# VPC ID where instances will be deployed
-# Find at: AWS Console > VPC > Your VPCs
-vpc_id = "vpc-xxxxxxxx"
+# Using first subnet for deployment
+subnet_id = "subnet-00d3b904db9b4423f"
 
-# Subnet ID where instances will be launched
-# Find at: AWS Console > VPC > Subnets
-subnet_id = "subnet-xxxxxxxx"
-
-# Security Group ID for network access control
-# Find at: AWS Console > EC2 > Security Groups
-security_group_id = "sg-xxxxxxxx"
+# Security group for EC2 instances
+security_group_id = "sg-039578fd8eed8b2ce"
 
 # Number of EC2 instances to create (each will have 3 primary + 1 secondary private IPs + 2 public EIPs)
 instance_count = 5
