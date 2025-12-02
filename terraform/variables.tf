@@ -5,21 +5,36 @@ variable "aws_region" {
 }
 
 variable "vpc_id" {
-  description = "VPC ID where instances will be deployed"
+  description = "VPC ID where instances will be deployed (REQUIRED - provide in terraform.tfvars)"
   type        = string
   default     = ""
+  
+  validation {
+    condition     = length(var.vpc_id) > 0 && strcontains(var.vpc_id, "vpc-")
+    error_message = "vpc_id must be provided and must be a valid VPC ID (e.g., vpc-12345678). Create terraform.tfvars with your values."
+  }
 }
 
 variable "subnet_id" {
-  description = "Subnet ID where instances will be deployed"
+  description = "Subnet ID where instances will be deployed (REQUIRED - provide in terraform.tfvars)"
   type        = string
   default     = ""
+  
+  validation {
+    condition     = length(var.subnet_id) > 0 && strcontains(var.subnet_id, "subnet-")
+    error_message = "subnet_id must be provided and must be a valid Subnet ID (e.g., subnet-12345678). Create terraform.tfvars with your values."
+  }
 }
 
 variable "security_group_id" {
-  description = "Security group ID for instances"
+  description = "Security group ID for instances (REQUIRED - provide in terraform.tfvars)"
   type        = string
   default     = ""
+  
+  validation {
+    condition     = length(var.security_group_id) > 0 && strcontains(var.security_group_id, "sg-")
+    error_message = "security_group_id must be provided and must be a valid Security Group ID (e.g., sg-12345678). Create terraform.tfvars with your values."
+  }
 }
 
 variable "instance_count" {
