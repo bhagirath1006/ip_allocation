@@ -30,6 +30,13 @@ provider "aws" {
   }
 }
 
+# Local values to determine which resources to use
+locals {
+  subnet_id         = var.create_vpc ? aws_subnet.public[0].id : var.subnet_id
+  vpc_id            = var.create_vpc ? aws_vpc.main[0].id : var.vpc_id
+  security_group_id = aws_security_group.main.id
+}
+
 # VPC for the instances
 resource "aws_vpc" "main" {
   count                = var.create_vpc ? 1 : 0
@@ -133,8 +140,8 @@ module "ec2_instances" {
   instance_count    = var.instance_count
   instance_type     = var.instance_type
   ami               = var.ami
-  subnet_id         = var.create_vpc ? aws_subnet.public[0].id : var.subnet_id
-  security_group_id = aws_security_group.main.id
+  subnet_id         = local.subnet_id
+  security_group_id = local.security_group_id
   project_name      = var.project_name
   environment       = var.environment
 
