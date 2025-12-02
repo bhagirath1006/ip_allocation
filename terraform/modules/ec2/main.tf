@@ -25,22 +25,14 @@ resource "aws_network_interface" "secondary" {
 
 # EC2 Instances
 resource "aws_instance" "main" {
-  count         = var.instance_count
-  ami           = var.ami
-  instance_type = var.instance_type
-  monitoring    = true
+  count                = var.instance_count
+  ami                  = var.ami
+  instance_type        = var.instance_type
+  monitoring           = true
+  iam_instance_profile = ""
 
-  # Attach primary network interface
-  network_interface {
-    network_interface_id = aws_network_interface.primary[count.index].id
-    device_index         = 0
-  }
-
-  # Attach secondary network interface
-  network_interface {
-    network_interface_id = aws_network_interface.secondary[count.index].id
-    device_index         = 1
-  }
+  # Use primary network interface
+  primary_network_interface_id = aws_network_interface.primary[count.index].id
 
   tags = {
     Name = "${var.project_name}-instance-${count.index + 1}"
@@ -50,6 +42,14 @@ resource "aws_instance" "main" {
     aws_network_interface.primary,
     aws_network_interface.secondary
   ]
+}
+
+# Attach secondary network interface
+resource "aws_network_interface_attachment" "secondary" {
+  count                = var.instance_count
+  instance_id          = aws_instance.main[count.index].id
+  network_interface_id = aws_network_interface.secondary[count.index].id
+  device_index         = 1
 }
 
 # Elastic IPs for Primary Network Interfaces
@@ -75,5 +75,5 @@ resource "aws_eip" "secondary" {
     Name = "${var.project_name}-eip-secondary-${count.index + 1}"
   }
 
-  depends_on = [aws_instance.main]
+  depends_on = [aws_network_interface_attachment.secondary]
 }
