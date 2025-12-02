@@ -1,18 +1,29 @@
-# Primary Network Interfaces with 3 private IPs each (1 primary + 2 secondary)
-resource "aws_network_interface" "primary" {
-  count           = var.instance_count
-  subnet_id       = var.subnet_id
-  security_groups = [var.security_group_id]
+# EC2 Instances with inline network interfaces
+resource "aws_instance" "main" {
+  count         = var.instance_count
+  ami           = var.ami
+  instance_type = var.instance_type
+  monitoring    = true
 
-  # 1 primary + 2 secondary private IPs
-  private_ips_count = 3
+  # Primary network interface with 3 private IPs
+  primary_network_interface_config {
+    networks_interface_count = 1
+    delete_on_termination    = true
+  }
+
+  # Use subnet_id and security groups directly
+  subnet_id              = var.subnet_id
+  vpc_security_group_ids = [var.security_group_id]
+
+  # Allocate 3 private IPs on primary interface (1 primary + 2 secondary)
+  private_ip_count = 3
 
   tags = {
-    Name = "${var.project_name}-eni-primary-${count.index + 1}"
+    Name = "${var.project_name}-instance-${count.index + 1}"
   }
 }
 
-# Secondary Network Interfaces with 1 private IP each
+# Secondary network interfaces (attached post-launch)
 resource "aws_network_interface" "secondary" {
   count           = var.instance_count
   subnet_id       = var.subnet_id
@@ -23,40 +34,21 @@ resource "aws_network_interface" "secondary" {
   }
 }
 
-# EC2 Instances
-resource "aws_instance" "main" {
-  count         = var.instance_count
-  ami           = var.ami
-  instance_type = var.instance_type
-  monitoring    = true
+# Attach secondary ENI to instances
+resource "aws_network_interface_attachment" "secondary" {
+  count                = var.instance_count
+  instance_id          = aws_instance.main[count.index].id
+  network_interface_id = aws_network_interface.secondary[count.index].id
+  device_index         = 1
 
-  # Attach primary network interface at device index 0
-  network_interface {
-    network_interface_id = aws_network_interface.primary[count.index].id
-    device_index         = 0
-  }
-
-  # Attach secondary network interface at device index 1
-  network_interface {
-    network_interface_id = aws_network_interface.secondary[count.index].id
-    device_index         = 1
-  }
-
-  tags = {
-    Name = "${var.project_name}-instance-${count.index + 1}"
-  }
-
-  depends_on = [
-    aws_network_interface.primary,
-    aws_network_interface.secondary
-  ]
+  depends_on = [aws_instance.main]
 }
 
-# Elastic IPs for Primary Network Interfaces
+# Elastic IP for Primary Network Interface
 resource "aws_eip" "primary" {
   count             = var.instance_count
   domain            = "vpc"
-  network_interface = aws_network_interface.primary[count.index].id
+  network_interface = aws_instance.main[count.index].primary_network_interface_id
 
   tags = {
     Name = "${var.project_name}-eip-primary-${count.index + 1}"
@@ -65,7 +57,7 @@ resource "aws_eip" "primary" {
   depends_on = [aws_instance.main]
 }
 
-# Elastic IPs for Secondary Network Interfaces
+# Elastic IP for Secondary Network Interface
 resource "aws_eip" "secondary" {
   count             = var.instance_count
   domain            = "vpc"
@@ -75,5 +67,5 @@ resource "aws_eip" "secondary" {
     Name = "${var.project_name}-eip-secondary-${count.index + 1}"
   }
 
-  depends_on = [aws_instance.main]
+  depends_on = [aws_network_interface_attachment.secondary]
 }
