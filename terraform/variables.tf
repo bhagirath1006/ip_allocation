@@ -1,7 +1,7 @@
 variable "aws_region" {
   description = "AWS region to deploy resources"
   type        = string
-  default     = "us-east-1"
+  default     = "ap-south-1"
 }
 
 variable "vpc_id" {
@@ -52,13 +52,13 @@ variable "instance_type" {
 variable "ami" {
   description = "AMI ID for EC2 instances (Amazon Linux 2)"
   type        = string
-  default     = "ami-0c02fb55956c7d316" # Amazon Linux 2 in us-east-1
+  default     = "ami-0a5ac53f63407e70b" # Amazon Linux 2 in ap-south-1
 }
 
 variable "availability_zones" {
   description = "List of availability zones to distribute instances"
   type        = list(string)
-  default     = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  default     = ["ap-south-1a", "ap-south-1b", "ap-south-1c"]
 }
 
 variable "environment" {
