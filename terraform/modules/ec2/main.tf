@@ -23,15 +23,16 @@ resource "aws_network_interface" "secondary" {
 
 # EC2 Instances - Use pre-created network interfaces
 resource "aws_instance" "main" {
-  count                = var.instance_count
-  ami                  = var.ami
-  instance_type        = var.instance_type
-  monitoring           = true
-  iam_instance_profile = ""
-  user_data            = base64encode("#!/bin/bash\necho 'Instance booting up'")
+  count         = var.instance_count
+  ami           = var.ami
+  instance_type = var.instance_type
+  monitoring    = true
 
-  # Primary network interface as the main interface
-  primary_network_interface_id = aws_network_interface.primary[count.index].id
+  # Primary network interface (device index 0)
+  network_interface {
+    network_interface_id = aws_network_interface.primary[count.index].id
+    device_index         = 0
+  }
 
   tags = {
     Name = "${var.project_name}-instance-${count.index + 1}"
@@ -41,11 +42,6 @@ resource "aws_instance" "main" {
     aws_network_interface.primary,
     aws_network_interface.secondary
   ]
-
-  # Wait for ENIs to be fully ready
-  lifecycle {
-    ignore_changes = [primary_network_interface_id]
-  }
 }
 
 # Attach Secondary Network Interfaces to instances
