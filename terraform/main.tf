@@ -138,8 +138,11 @@ module "ec2_instances" {
   project_name      = var.project_name
   environment       = var.environment
 
-  depends_on = concat(
-    var.create_vpc ? [aws_internet_gateway.main[0], aws_subnet.public[0]] : [],
-    [aws_security_group.main]
-  )
+  depends_on = [
+    aws_security_group.main,
+    aws_internet_gateway.main,
+    aws_subnet.public,
+    aws_route_table.public,
+    aws_route_table_association.public
+  ]
 }
