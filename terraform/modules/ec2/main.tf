@@ -1,22 +1,12 @@
 # EC2 Instances with inline network interfaces
 resource "aws_instance" "main" {
-  count         = var.instance_count
-  ami           = var.ami
-  instance_type = var.instance_type
-  monitoring    = true
-
-  # Primary network interface with 3 private IPs
-  primary_network_interface_config {
-    networks_interface_count = 1
-    delete_on_termination    = true
-  }
-
-  # Use subnet_id and security groups directly
-  subnet_id              = var.subnet_id
-  vpc_security_group_ids = [var.security_group_id]
-
-  # Allocate 3 private IPs on primary interface (1 primary + 2 secondary)
-  private_ip_count = 3
+  count             = var.instance_count
+  ami               = var.ami
+  instance_type     = var.instance_type
+  monitoring        = true
+  subnet_id         = var.subnet_id
+  security_groups   = [var.security_group_id]
+  private_ip_count  = 3
 
   tags = {
     Name = "${var.project_name}-instance-${count.index + 1}"
