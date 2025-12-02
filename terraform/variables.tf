@@ -52,7 +52,7 @@ variable "instance_type" {
 variable "ami" {
   description = "AMI ID for EC2 instances (Amazon Linux 2)"
   type        = string
-  default     = "ami-0a5ac53f63407e70b" # Amazon Linux 2 in ap-south-1
+  default     = "ami-00d2efe5bc0683614" # Amazon Linux 2 in ap-south-1
 }
 
 variable "availability_zones" {
