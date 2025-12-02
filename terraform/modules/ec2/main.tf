@@ -1,9 +1,9 @@
-# Primary Network Interfaces with 3 private IPs each (1 primary + 2 secondary)
+# Primary Network Interfaces with 2 private IPs each (1 primary + 1 secondary)
 resource "aws_network_interface" "primary" {
   count              = var.instance_count
   subnet_id          = var.subnet_id
   security_groups    = [var.security_group_id]
-  private_ips_count  = 3
+  private_ips_count  = 2
 
   tags = {
     Name = "${var.project_name}-eni-primary-${count.index + 1}"
