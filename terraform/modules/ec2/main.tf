@@ -60,9 +60,6 @@ resource "aws_eip" "primary" {
   count             = var.instance_count
   domain            = "vpc"
   network_interface = aws_network_interface.primary[count.index].id
-  
-  # Primary IP association
-  association_public_ip_address = aws_network_interface.primary[count.index].primary_private_ip_address
 
   tags = {
     Name = "${var.project_name}-eip-primary-${count.index + 1}"
