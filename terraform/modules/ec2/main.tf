@@ -23,27 +23,39 @@ resource "aws_network_interface" "secondary" {
   }
 }
 
-# EC2 Instances
+# EC2 Instances - created without any network interfaces initially
 resource "aws_instance" "main" {
-  count         = var.instance_count
-  ami           = var.ami
-  instance_type = var.instance_type
-  monitoring    = true
+  count                = var.instance_count
+  ami                  = var.ami
+  instance_type        = var.instance_type
+  monitoring           = true
+  subnet_id            = var.subnet_id
+  vpc_security_group_ids = [var.security_group_id]
 
-  # Attach primary network interface
-  network_interface {
-    network_interface_id = aws_network_interface.primary[count.index].id
-    device_index         = 0
-  }
+  # Disable primary ENI to use custom one
+  associate_public_ip_address = false
 
   tags = {
     Name = "${var.project_name}-instance-${count.index + 1}"
   }
 
   depends_on = [
-    aws_network_interface.primary,
-    aws_network_interface.secondary
+    aws_network_interface.primary
   ]
+
+  lifecycle {
+    ignore_changes = [network_interface]
+  }
+}
+
+# Attach primary network interface
+resource "aws_network_interface_attachment" "primary" {
+  count                = var.instance_count
+  instance_id          = aws_instance.main[count.index].id
+  network_interface_id = aws_network_interface.primary[count.index].id
+  device_index         = 0
+
+  depends_on = [aws_instance.main]
 }
 
 # Attach secondary network interface
@@ -52,6 +64,8 @@ resource "aws_network_interface_attachment" "secondary" {
   instance_id          = aws_instance.main[count.index].id
   network_interface_id = aws_network_interface.secondary[count.index].id
   device_index         = 1
+
+  depends_on = [aws_network_interface_attachment.primary]
 }
 
 # Elastic IPs for Primary Network Interfaces
