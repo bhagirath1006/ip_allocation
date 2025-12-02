@@ -1,9 +1,9 @@
 # Primary Network Interfaces with 2 private IPs each (1 primary + 1 secondary)
 resource "aws_network_interface" "primary" {
-  count              = var.instance_count
-  subnet_id          = var.subnet_id
-  security_groups    = [var.security_group_id]
-  private_ips_count  = 2
+  count             = var.instance_count
+  subnet_id         = var.subnet_id
+  security_groups   = [var.security_group_id]
+  private_ips_count = 2
 
   tags = {
     Name = "${var.project_name}-eni-primary-${count.index + 1}"
@@ -27,11 +27,11 @@ resource "aws_instance" "main" {
   ami           = var.ami
   instance_type = var.instance_type
   monitoring    = false
-  
+
   # Use primary network interface only for launch
   subnet_id              = var.subnet_id
   vpc_security_group_ids = [var.security_group_id]
-  
+
   # Disable source/dest check to allow multi-IP routing
   source_dest_check = false
 

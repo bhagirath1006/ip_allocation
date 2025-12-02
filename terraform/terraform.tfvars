@@ -1,6 +1,6 @@
 # AWS Resource IDs - Your actual values
 aws_region = "ap-south-1"
-vpc_id = "vpc-0a315454a37dc7412"
+vpc_id     = "vpc-0a315454a37dc7412"
 
 # Using second subnet for deployment
 subnet_id = "subnet-0384e2e784fb94bde"

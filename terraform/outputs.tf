@@ -1,29 +1,33 @@
 output "instances" {
-  description = "Details of all EC2 instances"
+  description = "Details of all EC2 instances with their IP configuration"
   value = {
     for idx, instance in module.ec2_instances.instances : "instance_${idx + 1}" => {
-      instance_id         = instance.id
-      primary_eni_id      = instance.primary_network_interface_id
-      secondary_eni_id    = module.ec2_instances.secondary_enis[idx].id
-      private_ips_primary = module.ec2_instances.primary_enis[idx].private_ips
-      primary_eip         = module.ec2_instances.primary_eips[idx].public_ip
-      secondary_eip       = module.ec2_instances.secondary_eips[idx].public_ip
+      instance_id          = instance.id
+      instance_name        = instance.tags.Name
+      instance_type        = instance.instance_type
+      availability_zone    = instance.availability_zone
+      primary_eni_id       = module.ec2_instances.primary_enis[idx].id
+      primary_private_ips  = sort(module.ec2_instances.primary_enis[idx].private_ips)
+      secondary_eni_id     = module.ec2_instances.secondary_enis[idx].id
+      secondary_private_ip = tolist(module.ec2_instances.secondary_enis[idx].private_ips)[0]
     }
   }
 }
 
 output "instance_summary" {
-  description = "Summary of all instances with IPs"
+  description = "Summary of all instances with their IP addresses"
   value = [
     for idx, instance in module.ec2_instances.instances : {
-      name        = "instance-${idx + 1}"
-      instance_id = instance.id
-      private_ips = instance.primary_network_interface_id
-      public_eips = [
-        module.ec2_instances.primary_eips[idx].public_ip,
-        module.ec2_instances.secondary_eips[idx].public_ip
-      ]
-      az = instance.availability_zone
+      name              = "instance-${idx + 1}"
+      instance_id       = instance.id
+      instance_type     = instance.instance_type
+      availability_zone = instance.availability_zone
+      primary_ips       = sort(module.ec2_instances.primary_enis[idx].private_ips)
+      secondary_ip      = tolist(module.ec2_instances.secondary_enis[idx].private_ips)[0]
+      total_private_ips = concat(
+        sort(module.ec2_instances.primary_enis[idx].private_ips),
+        tolist(module.ec2_instances.secondary_enis[idx].private_ips)
+      )
     }
   ]
 }

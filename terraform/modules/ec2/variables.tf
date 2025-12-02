@@ -18,7 +18,7 @@ variable "ami" {
 variable "subnet_id" {
   description = "Subnet ID where instances will be deployed (REQUIRED)"
   type        = string
-  
+
   validation {
     condition     = length(var.subnet_id) > 0 && strcontains(var.subnet_id, "subnet-")
     error_message = "subnet_id must be a valid subnet ID (e.g., subnet-12345678). Please provide this in terraform.tfvars."
@@ -28,7 +28,7 @@ variable "subnet_id" {
 variable "security_group_id" {
   description = "Security group ID for instances (REQUIRED)"
   type        = string
-  
+
   validation {
     condition     = length(var.security_group_id) > 0 && strcontains(var.security_group_id, "sg-")
     error_message = "security_group_id must be a valid security group ID (e.g., sg-12345678). Please provide this in terraform.tfvars."

@@ -17,10 +17,10 @@ output "instance_details" {
   description = "Comprehensive details of all instances with their IPs"
   value = [
     for idx, instance in aws_instance.main : {
-      instance_id          = instance.id
-      instance_name        = instance.tags.Name
-      availability_zone    = instance.availability_zone
-      instance_type        = instance.instance_type
+      instance_id       = instance.id
+      instance_name     = instance.tags.Name
+      availability_zone = instance.availability_zone
+      instance_type     = instance.instance_type
 
       primary_eni = {
         eni_id      = aws_network_interface.primary[idx].id
