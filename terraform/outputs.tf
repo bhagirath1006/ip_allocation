@@ -29,16 +29,16 @@ output "instance_summary" {
 }
 
 output "vpc_id" {
-  description = "VPC ID"
-  value       = local.vpc_id
+  description = "VPC ID used for instances"
+  value       = var.vpc_id
 }
 
 output "subnet_id" {
-  description = "Public Subnet ID"
-  value       = local.subnet_id
+  description = "Subnet ID used for instances"
+  value       = var.subnet_id
 }
 
 output "security_group_id" {
-  description = "Security Group ID"
-  value       = local.security_group_id
+  description = "Security Group ID used for instances"
+  value       = var.security_group_id
 }

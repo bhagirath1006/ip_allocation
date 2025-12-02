@@ -1,15 +1,10 @@
 # AWS Configuration
 aws_region = "us-east-1"
 
-# VPC Configuration
-# OPTION 1: Create a new VPC (set create_vpc = true)
-create_vpc = true
-
-# OPTION 2: Use an existing VPC (set create_vpc = false and provide these IDs)
-# create_vpc = false
-# vpc_id           = "vpc-xxxxxxxxx"        # Your existing VPC ID
-# subnet_id        = "subnet-xxxxxx"        # Your existing subnet ID
-# security_group_id = "sg-xxxxxxxxx"        # Your existing security group ID
+# **REQUIRED**: Provide your existing VPC resources
+vpc_id           = "vpc-xxxxxxxxx"        # Your VPC ID
+subnet_id        = "subnet-xxxxxx"        # Your Subnet ID  
+security_group_id = "sg-xxxxxxxxx"        # Your Security Group ID
 
 # Instance Configuration
 instance_count = 5
