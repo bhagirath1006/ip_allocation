@@ -13,16 +13,6 @@ output "secondary_enis" {
   value       = aws_network_interface.secondary
 }
 
-output "primary_eips" {
-  description = "Primary Elastic IPs"
-  value       = aws_eip.primary
-}
-
-output "secondary_eips" {
-  description = "Secondary Elastic IPs"
-  value       = aws_eip.secondary
-}
-
 output "instance_details" {
   description = "Comprehensive details of all instances with their IPs"
   value = [
@@ -35,15 +25,11 @@ output "instance_details" {
       primary_eni = {
         eni_id      = aws_network_interface.primary[idx].id
         private_ips = sort(aws_network_interface.primary[idx].private_ips)
-        eip         = aws_eip.primary[idx].public_ip
-        eip_id      = aws_eip.primary[idx].id
       }
 
       secondary_eni = {
         eni_id     = aws_network_interface.secondary[idx].id
         private_ip = tolist(aws_network_interface.secondary[idx].private_ips)[0]
-        eip        = aws_eip.secondary[idx].public_ip
-        eip_id     = aws_eip.secondary[idx].id
       }
     }
   ]

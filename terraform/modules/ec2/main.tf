@@ -65,29 +65,3 @@ resource "aws_network_interface_attachment" "secondary" {
 
   depends_on = [aws_network_interface_attachment.primary]
 }
-
-# Elastic IP for Primary Network Interface
-resource "aws_eip" "primary" {
-  count             = var.instance_count
-  domain            = "vpc"
-  network_interface = aws_network_interface.primary[count.index].id
-
-  tags = {
-    Name = "${var.project_name}-eip-primary-${count.index + 1}"
-  }
-
-  depends_on = [aws_instance.main]
-}
-
-# Elastic IP for Secondary Network Interface
-resource "aws_eip" "secondary" {
-  count             = var.instance_count
-  domain            = "vpc"
-  network_interface = aws_network_interface.secondary[count.index].id
-
-  tags = {
-    Name = "${var.project_name}-eip-secondary-${count.index + 1}"
-  }
-
-  depends_on = [aws_instance.main]
-}
