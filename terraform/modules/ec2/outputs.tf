@@ -41,7 +41,7 @@ output "instance_details" {
       
       secondary_eni = {
         eni_id      = aws_network_interface.secondary[idx].id
-        private_ip  = aws_network_interface.secondary[idx].private_ip_address
+        private_ip  = aws_network_interface.secondary[idx].private_ips[0]
         eip         = aws_eip.secondary[idx].public_ip
         eip_id      = aws_eip.secondary[idx].id
       }

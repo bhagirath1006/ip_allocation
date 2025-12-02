@@ -4,10 +4,10 @@ output "instances" {
     for idx, instance in module.ec2_instances.instances : "instance_${idx + 1}" => {
       instance_id           = instance.id
       primary_eni_id        = instance.primary_network_interface_id
-      secondary_eni_id      = instance.network_interfaces[1]
-      private_ips_primary   = instance.primary_network_interface_id
-      primary_eip           = module.ec2_instances.primary_eips[idx]
-      secondary_eip         = module.ec2_instances.secondary_eips[idx]
+      secondary_eni_id      = module.ec2_instances.secondary_enis[idx].id
+      private_ips_primary   = module.ec2_instances.primary_enis[idx].private_ips
+      primary_eip           = module.ec2_instances.primary_eips[idx].public_ip
+      secondary_eip         = module.ec2_instances.secondary_eips[idx].public_ip
     }
   }
 }
