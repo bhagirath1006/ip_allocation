@@ -32,6 +32,27 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
+      - name: Check for terraform.tfvars
+        working-directory: ./terraform
+        run: |
+          if [ ! -f terraform.tfvars ]; then
+            echo "❌ ERROR: terraform.tfvars not found!"
+            echo ""
+            echo "To deploy this infrastructure, you MUST create terraform/terraform.tfvars with:"
+            echo ""
+            echo "  vpc_id            = \"vpc-xxxxxxxx\""
+            echo "  subnet_id         = \"subnet-xxxxxxxx\""
+            echo "  security_group_id = \"sg-xxxxxxxx\""
+            echo "  instance_count    = 5"
+            echo ""
+            echo "Get these values from your AWS Console:"
+            echo "1. VPC ID: VPC dashboard"
+            echo "2. Subnet ID: VPC > Subnets"
+            echo "3. Security Group ID: EC2 > Security Groups"
+            echo ""
+            exit 1
+          fi
+
       - name: Terraform Format Check
         working-directory: ./terraform
         run: terraform fmt -check -recursive
