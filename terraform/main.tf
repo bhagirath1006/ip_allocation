@@ -32,6 +32,7 @@ provider "aws" {
 
 # VPC for the instances
 resource "aws_vpc" "main" {
+  count                = var.create_vpc ? 1 : 0
   cidr_block           = "10.0.0.0/16"
   enable_dns_hostnames = true
   enable_dns_support   = true
@@ -43,7 +44,8 @@ resource "aws_vpc" "main" {
 
 # Internet Gateway
 resource "aws_internet_gateway" "main" {
-  vpc_id = aws_vpc.main.id
+  count  = var.create_vpc ? 1 : 0
+  vpc_id = aws_vpc.main[0].id
 
   tags = {
     Name = "${var.project_name}-igw"
@@ -52,7 +54,8 @@ resource "aws_internet_gateway" "main" {
 
 # Public Subnet
 resource "aws_subnet" "public" {
-  vpc_id                  = aws_vpc.main.id
+  count                   = var.create_vpc ? 1 : 0
+  vpc_id                  = aws_vpc.main[0].id
   cidr_block              = "10.0.1.0/24"
   availability_zone       = var.availability_zones[0]
   map_public_ip_on_launch = false
@@ -64,11 +67,12 @@ resource "aws_subnet" "public" {
 
 # Route Table
 resource "aws_route_table" "public" {
-  vpc_id = aws_vpc.main.id
+  count  = var.create_vpc ? 1 : 0
+  vpc_id = aws_vpc.main[0].id
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.main.id
+    gateway_id = aws_internet_gateway.main[0].id
   }
 
   tags = {
@@ -78,15 +82,16 @@ resource "aws_route_table" "public" {
 
 # Route Table Association
 resource "aws_route_table_association" "public" {
-  subnet_id      = aws_subnet.public.id
-  route_table_id = aws_route_table.public.id
+  count          = var.create_vpc ? 1 : 0
+  subnet_id      = aws_subnet.public[0].id
+  route_table_id = aws_route_table.public[0].id
 }
 
 # Security Group
 resource "aws_security_group" "main" {
   name_prefix = "${var.project_name}-sg-"
   description = "Security group for EC2 instances"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = var.create_vpc ? aws_vpc.main[0].id : var.vpc_id
 
   ingress {
     from_port   = 22
@@ -128,7 +133,7 @@ module "ec2_instances" {
   instance_count    = var.instance_count
   instance_type     = var.instance_type
   ami               = var.ami
-  subnet_id         = aws_subnet.public.id
+  subnet_id         = var.create_vpc ? aws_subnet.public[0].id : var.subnet_id
   security_group_id = aws_security_group.main.id
   project_name      = var.project_name
   environment       = var.environment

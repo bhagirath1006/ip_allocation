@@ -4,6 +4,30 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
+variable "create_vpc" {
+  description = "Whether to create a new VPC. Set to false to use existing VPC."
+  type        = bool
+  default     = false
+}
+
+variable "vpc_id" {
+  description = "Existing VPC ID to use (required if create_vpc is false)"
+  type        = string
+  default     = ""
+}
+
+variable "subnet_id" {
+  description = "Existing subnet ID to use (required if create_vpc is false)"
+  type        = string
+  default     = ""
+}
+
+variable "security_group_id" {
+  description = "Existing security group ID to use (required if create_vpc is false)"
+  type        = string
+  default     = ""
+}
+
 variable "instance_count" {
   description = "Number of EC2 instances to create"
   type        = number

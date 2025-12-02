@@ -30,12 +30,12 @@ output "instance_summary" {
 
 output "vpc_id" {
   description = "VPC ID"
-  value       = aws_vpc.main.id
+  value       = var.create_vpc ? aws_vpc.main[0].id : var.vpc_id
 }
 
 output "subnet_id" {
   description = "Public Subnet ID"
-  value       = aws_subnet.public.id
+  value       = var.create_vpc ? aws_subnet.public[0].id : var.subnet_id
 }
 
 output "security_group_id" {
