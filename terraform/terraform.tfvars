@@ -1,8 +1,8 @@
 # AWS Resource IDs - Your actual values
 vpc_id = "vpc-0ed9e59c3d9a8c9f5"
 
-# Using first subnet for deployment
-subnet_id = "subnet-00d3b904db9b4423f"
+# Using second subnet for deployment
+subnet_id = "subnet-0384e2e784fb94bde"
 
 # Security group for EC2 instances
 security_group_id = "sg-039578fd8eed8b2ce"
