@@ -1,19 +1,16 @@
-# EC2 Instances with inline network interfaces
-resource "aws_instance" "main" {
-  count             = var.instance_count
-  ami               = var.ami
-  instance_type     = var.instance_type
-  monitoring        = true
-  subnet_id         = var.subnet_id
-  security_groups   = [var.security_group_id]
-  private_ip_count  = 3
+# Primary Network Interfaces with 3 private IPs each (1 primary + 2 secondary)
+resource "aws_network_interface" "primary" {
+  count              = var.instance_count
+  subnet_id          = var.subnet_id
+  security_groups    = [var.security_group_id]
+  private_ips_count  = 3
 
   tags = {
-    Name = "${var.project_name}-instance-${count.index + 1}"
+    Name = "${var.project_name}-eni-primary-${count.index + 1}"
   }
 }
 
-# Secondary network interfaces (attached post-launch)
+# Secondary Network Interfaces with 1 private IP each
 resource "aws_network_interface" "secondary" {
   count           = var.instance_count
   subnet_id       = var.subnet_id
@@ -24,21 +21,40 @@ resource "aws_network_interface" "secondary" {
   }
 }
 
-# Attach secondary ENI to instances
-resource "aws_network_interface_attachment" "secondary" {
-  count                = var.instance_count
-  instance_id          = aws_instance.main[count.index].id
-  network_interface_id = aws_network_interface.secondary[count.index].id
-  device_index         = 1
+# EC2 Instances - Use pre-created network interfaces
+resource "aws_instance" "main" {
+  count         = var.instance_count
+  ami           = var.ami
+  instance_type = var.instance_type
+  monitoring    = true
 
-  depends_on = [aws_instance.main]
+  # Primary network interface
+  network_interface {
+    network_interface_id = aws_network_interface.primary[count.index].id
+    device_index         = 0
+  }
+
+  # Secondary network interface
+  network_interface {
+    network_interface_id = aws_network_interface.secondary[count.index].id
+    device_index         = 1
+  }
+
+  tags = {
+    Name = "${var.project_name}-instance-${count.index + 1}"
+  }
+
+  depends_on = [
+    aws_network_interface.primary,
+    aws_network_interface.secondary
+  ]
 }
 
 # Elastic IP for Primary Network Interface
 resource "aws_eip" "primary" {
   count             = var.instance_count
   domain            = "vpc"
-  network_interface = aws_instance.main[count.index].primary_network_interface_id
+  network_interface = aws_network_interface.primary[count.index].id
 
   tags = {
     Name = "${var.project_name}-eip-primary-${count.index + 1}"
@@ -57,5 +73,5 @@ resource "aws_eip" "secondary" {
     Name = "${var.project_name}-eip-secondary-${count.index + 1}"
   }
 
-  depends_on = [aws_network_interface_attachment.secondary]
+  depends_on = [aws_instance.main]
 }
