@@ -25,7 +25,6 @@ provider "aws" {
       var.tags,
       {
         Environment = var.environment
-        CreatedAt   = timestamp()
       }
     )
   }
@@ -68,8 +67,8 @@ resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
 
   route {
-    cidr_block      = "0.0.0.0/0"
-    gateway_id      = aws_internet_gateway.main.id
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.main.id
   }
 
   tags = {
@@ -126,13 +125,13 @@ resource "aws_security_group" "main" {
 module "ec2_instances" {
   source = "./modules/ec2"
 
-  instance_count       = var.instance_count
-  instance_type        = var.instance_type
-  ami                  = var.ami
-  subnet_id            = aws_subnet.public.id
-  security_group_id    = aws_security_group.main.id
-  project_name         = var.project_name
-  environment          = var.environment
+  instance_count    = var.instance_count
+  instance_type     = var.instance_type
+  ami               = var.ami
+  subnet_id         = aws_subnet.public.id
+  security_group_id = aws_security_group.main.id
+  project_name      = var.project_name
+  environment       = var.environment
 
   depends_on = [
     aws_internet_gateway.main

@@ -3,7 +3,7 @@ resource "aws_network_interface" "primary" {
   count           = var.instance_count
   subnet_id       = var.subnet_id
   security_groups = [var.security_group_id]
-  
+
   # 1 primary + 2 secondary private IPs
   private_ips_count = 3
 
@@ -25,10 +25,10 @@ resource "aws_network_interface" "secondary" {
 
 # EC2 Instances
 resource "aws_instance" "main" {
-  count              = var.instance_count
-  ami                = var.ami
-  instance_type      = var.instance_type
-  monitoring         = true
+  count         = var.instance_count
+  ami           = var.ami
+  instance_type = var.instance_type
+  monitoring    = true
 
   # Attach primary network interface
   network_interface {
