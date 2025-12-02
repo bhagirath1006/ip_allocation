@@ -25,14 +25,16 @@ resource "aws_network_interface" "secondary" {
 
 # EC2 Instances
 resource "aws_instance" "main" {
-  count                = var.instance_count
-  ami                  = var.ami
-  instance_type        = var.instance_type
-  monitoring           = true
-  iam_instance_profile = ""
+  count         = var.instance_count
+  ami           = var.ami
+  instance_type = var.instance_type
+  monitoring    = true
 
-  # Use primary network interface
-  primary_network_interface_id = aws_network_interface.primary[count.index].id
+  # Attach primary network interface
+  network_interface {
+    network_interface_id = aws_network_interface.primary[count.index].id
+    device_index         = 0
+  }
 
   tags = {
     Name = "${var.project_name}-instance-${count.index + 1}"
