@@ -42,9 +42,6 @@ resource "aws_instance" "main" {
     device_index         = 1
   }
 
-  # Disable source/dest check to allow IP forwarding (optional)
-  source_dest_check = false
-
   tags = {
     Name = "${var.project_name}-instance-${count.index + 1}"
   }
